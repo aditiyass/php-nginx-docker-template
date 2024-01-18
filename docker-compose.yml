@@ -1,0 +1,100 @@
+version: '3'
+
+services:
+  nginx:
+    container_name: 'nginx_server'
+    image: nginx:alpine
+    restart: always
+    links:
+      - 5-6-fpm
+      - 7-4-fpm
+      - 8-2-fpm
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ${DATA_DIR:-./data}/nginx/enabled:/etc/nginx/conf.d
+      - ${DATA_DIR:-./data}/nginx/snippets:/nginx/snippets
+      - ${DATA_DIR:-./data}/nginx/certificates:/nginx/certificates
+    volumes_from:
+      - data
+    networks:
+      nginxinternal:
+        ipv4_address: 10.10.10.10
+
+  #5-6-23-fpm:
+  #  image: php:5.6.23-fpm-alpine
+  #  restart: always
+  #  volumes_from:
+  #    - data
+
+  #7-0-8-fpm:
+  #  image: php:7.0.8-fpm-alpine
+  #  restart: always
+  #  volumes_from:
+  #    - data
+
+  8-2-fpm:
+    container_name: 'php82fpm'
+    #image: php:8.2-fpm-alpine
+    build:
+        dockerfile: ./docker/php82fpm/Dockerfile
+    restart: always
+    volumes_from:
+      - data
+    networks:
+      - nginxinternal
+      - dbnetwork
+      - broadcasternetwork
+
+  7-4-fpm:
+    container_name: 'php74fpm'
+    #image: php:7.4-fpm-alpine
+    build:
+        dockerfile: ./docker/php74fpm/Dockerfile
+    restart: always
+    volumes_from:
+      - data
+    networks:
+      - nginxinternal
+      - dbnetwork
+      - broadcasternetwork
+
+  5-6-fpm:
+    container_name: 'php56fpm'
+    #image: php:5.6-fpm-alpine
+    build:
+        dockerfile: ./docker/php56fpm/Dockerfile
+    restart: always
+    volumes_from:
+      - data
+    networks:
+      - nginxinternal
+      - dbnetwork
+      - broadcasternetwork
+
+  data:
+    container_name: 'nginxphpvolume'
+    image: alpine:latest
+    command: echo "READY!!!"
+    volumes:
+      - ${DATA_DIR:-./data}/vhosts:/vhosts
+      - ${DATA_DIR:-./data}/tmp:/tmp
+      - ${IKS_PROJECTS_DIR:-~/Projects/Infinindotech}:/iks
+    networks:
+      - nginxinternal
+
+networks:
+  dbnetwork:
+    name: ${DB_NETWORK:-mariadbnet}
+    external: true
+  broadcasternetwork:
+    name: ${BROADCAST_NETWORK:-soketinet}
+    external: true
+  nginxinternal:
+    name: nginxinternalconnection
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.10.10.0/24
+          gateway: 10.10.10.1
