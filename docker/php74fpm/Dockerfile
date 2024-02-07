@@ -19,4 +19,6 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 RUN chmod +x /usr/local/bin/install-php-extensions && \
     install-php-extensions gd xdebug bcmath bz2 calendar intl mysqli pdo_mysql pgsql pdo_pgsql snmp soap sockets zip imagick
 
+RUN chmod 777 /tmp
+
 # RUN socat TCP-LISTEN:80,fork TCP:10.10.10.10:80 &
