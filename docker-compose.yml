@@ -42,6 +42,8 @@ services:
     restart: always
     volumes_from:
       - data
+    volumes:
+      - ./docker/php82fpm/php.ini-development:/usr/local/etc/php/php.ini
     networks:
       - nginxinternal
       - dbnetwork
