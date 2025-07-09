@@ -83,6 +83,7 @@ services:
       - ${DATA_DIR:-./data}/vhosts:/vhosts
       - ${DATA_DIR:-./data}/tmp:/tmp
       - ${IKS_PROJECTS_DIR:-~/Projects/Infinindotech}:/iks
+      - ${BPOM_PROJECTS_DIR:-~/BPOMProject}:/bpom
     networks:
       - nginxinternal
 
