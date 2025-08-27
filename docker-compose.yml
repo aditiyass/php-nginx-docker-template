@@ -7,6 +7,7 @@ services:
       - 5-6-fpm
       - 7-4-fpm
       - 8-2-fpm
+      - 8-1-fpm
       - 8-3-fpm
     ports:
       - "80:80"
@@ -46,6 +47,21 @@ services:
       - data
     volumes:
       - ./docker/php82fpm/php.ini-development:/usr/local/etc/php/php.ini
+    networks:
+      - nginxinternal
+      - dbnetwork
+      - broadcasternetwork
+
+  8-1-fpm:
+    container_name: 'php81fpm'
+    #image: php:8.1-fpm-alpine
+    build:
+        dockerfile: ./docker/php81fpm/Dockerfile
+    restart: always
+    volumes_from:
+      - data
+    volumes:
+      - ./docker/php81fpm/php.ini-development:/usr/local/etc/php/php.ini
     networks:
       - nginxinternal
       - dbnetwork
